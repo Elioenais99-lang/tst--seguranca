@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TST — Controle de Segurança da Obra</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #13161e;
+    --surface2: #1a1f2b;
+    --border: #252b38;
+    --accent: #f5a623;
+    --accent2: #e84040;
+    --accent3: #2ecc71;
+    --accent4: #3498db;
+    --text: #e8ecf4;
+    --muted: #6b7590;
+    --danger: #e84040;
+    --warning: #f5a623;
+    --ok: #2ecc71;
+  }
+
+- { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘IBM Plex Sans’, sans-serif;
+min-height: 100vh;
+overflow-x: hidden;
+}
+
+/* HEADER */
+header {
+background: var(–surface);
+border-bottom: 2px solid var(–accent);
+padding: 0 32px;
+display: flex;
+align-items: center;
+justify-content: space-between;
+height: 68px;
+position: sticky;
+top: 0;
+z-index: 100;
+}
+
+.logo {
+display: flex;
+align-items: center;
+gap: 14px;
+}
+
+.logo-badge {
+background: var(–accent);
+color: #000;
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 22px;
+padding: 4px 12px;
+letter-spacing: 2px;
+}
+
+.logo-text {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 11px;
+color: var(–muted);
+text-transform: uppercase;
+letter-spacing: 1.5px;
+line-height: 1.6;
+}
+
+.header-right {
+display: flex;
+align-items: center;
+gap: 16px;
+}
+
+#currentDate {
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 12px;
+color: var(–accent);
+letter-spacing: 1px;
+}
+
+/* TABS */
+.tabs {
+display: flex;
+background: var(–surface);
+border-bottom: 1px solid var(–border);
+padding: 0 32px;
+gap: 0;
+overflow-x: auto;
+}
+
+.tab {
+padding: 14px 24px;
+font-size: 12px;
+font-weight: 500;
+text-transform: uppercase;
+letter-spacing: 1.5px;
+color: var(–muted);
+cursor: pointer;
+border-bottom: 3px solid transparent;
+white-space: nowrap;
+transition: all 0.2s;
+}
+
+.tab:hover { color: var(–text); }
+
+.tab.active {
+color: var(–accent);
+border-bottom-color: var(–accent);
+}
+
+/* MAIN */
+main {
+padding: 32px;
+max-width: 1400px;
+margin: 0 auto;
+}
+
+.section { display: none; }
+.section.active { display: block; }
+
+/* SECTION HEADER */
+.section-title {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 36px;
+letter-spacing: 3px;
+color: var(–accent);
+margin-bottom: 4px;
+}
+
+.section-sub {
+font-size: 12px;
+color: var(–muted);
+margin-bottom: 28px;
+letter-spacing: 0.5px;
+}
+
+/* CARDS GRID */
+.kpi-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 16px;
+margin-bottom: 32px;
+}
+
+.kpi-card {
+background: var(–surface);
+border: 1px solid var(–border);
+padding: 20px;
+position: relative;
+overflow: hidden;
+transition: border-color 0.2s;
+}
+
+.kpi-card::before {
+content: ‘’;
+position: absolute;
+left: 0; top: 0; bottom: 0;
+width: 3px;
+background: var(–accent4);
+}
+
+.kpi-card.danger::before { background: var(–danger); }
+.kpi-card.warning::before { background: var(–warning); }
+.kpi-card.ok::before { background: var(–ok); }
+
+.kpi-label {
+font-size: 10px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 1.5px;
+color: var(–muted);
+margin-bottom: 10px;
+}
+
+.kpi-value {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 42px;
+line-height: 1;
+color: var(–text);
+}
+
+.kpi-unit {
+font-size: 11px;
+color: var(–muted);
+margin-top: 4px;
+}
+
+/* FORM PANELS */
+.panel {
+background: var(–surface);
+border: 1px solid var(–border);
+padding: 28px;
+margin-bottom: 24px;
+}
+
+.panel-title {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 20px;
+letter-spacing: 2px;
+color: var(–accent);
+margin-bottom: 20px;
+padding-bottom: 12px;
+border-bottom: 1px solid var(–border);
+display: flex;
+align-items: center;
+gap: 10px;
+}
+
+.panel-title .dot {
+width: 8px;
+height: 8px;
+border-radius: 50%;
+background: var(–accent);
+display: inline-block;
+}
+
+.form-row {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+gap: 16px;
+margin-bottom: 16px;
+}
+
+.form-group {
+display: flex;
+flex-direction: column;
+gap: 6px;
+}
+
+.form-group.full { grid-column: 1 / -1; }
+
+label {
+font-size: 10px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 1.5px;
+color: var(–muted);
+}
+
+input, select, textarea {
+background: var(–surface2);
+border: 1px solid var(–border);
+color: var(–text);
+padding: 10px 14px;
+font-family: ‘IBM Plex Sans’, sans-serif;
+font-size: 14px;
+outline: none;
+transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+border-color: var(–accent);
+}
+
+select option { background: var(–surface2); }
+
+textarea { resize: vertical; min-height: 80px; }
+
+/* TOGGLE */
+.toggle-group {
+display: flex;
+gap: 8px;
+align-items: center;
+margin-top: 4px;
+}
+
+.toggle-btn {
+padding: 8px 16px;
+font-size: 12px;
+font-weight: 500;
+cursor: pointer;
+border: 1px solid var(–border);
+background: transparent;
+color: var(–muted);
+letter-spacing: 0.5px;
+transition: all 0.2s;
+}
+
+.toggle-btn.active-yes {
+background: var(–ok);
+border-color: var(–ok);
+color: #000;
+font-weight: 600;
+}
+
+.toggle-btn.active-no {
+background: var(–danger);
+border-color: var(–danger);
+color: #fff;
+font-weight: 600;
+}
+
+/* BUTTONS */
+.btn {
+padding: 12px 28px;
+font-family: ‘IBM Plex Mono’, monospace;
+font-size: 12px;
+font-weight: 500;
+letter-spacing: 1.5px;
+text-transform: uppercase;
+cursor: pointer;
+border: none;
+transition: all 0.2s;
+}
+
+.btn-primary {
+background: var(–accent);
+color: #000;
+}
+
+.btn-primary:hover { background: #e09515; }
+
+.btn-danger {
+background: var(–danger);
+color: #fff;
+}
+
+.btn-outline {
+background: transparent;
+border: 1px solid var(–accent);
+color: var(–accent);
+}
+
+.btn-outline:hover {
+background: var(–accent);
+color: #000;
+}
+
+.btn-sm {
+padding: 7px 14px;
+font-size: 11px;
+}
+
+/* TABLE */
+.table-wrap {
+overflow-x: auto;
+margin-top: 20px;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+font-size: 13px;
+}
+
+thead tr {
+border-bottom: 2px solid var(–accent);
+}
+
+th {
+font-size: 10px;
+font-weight: 600;
+text-transform: uppercase;
+letter-spacing: 1.5px;
+color: var(–muted);
+padding: 10px 14px;
+text-align: left;
+white-space: nowrap;
+}
+
+td {
+padding: 11px 14px;
+border-bottom: 1px solid var(–border);
+vertical-align: middle;
+}
+
+tbody tr:hover { background: var(–surface2); }
+
+.badge {
+display: inline-block;
+padding: 3px 10px;
+font-size: 10px;
+font-weight: 600;
+letter-spacing: 1px;
+text-transform: uppercase;
+}
+
+.badge-ok { background: rgba(46,204,113,0.15); color: var(–ok); }
+.badge-danger { background: rgba(232,64,64,0.15); color: var(–danger); }
+.badge-warn { background: rgba(245,166,35,0.15); color: var(–warning); }
+
+/* ACTIONS ROW */
+.actions-row {
+display: flex;
+gap: 12px;
+align-items: center;
+flex-wrap: wrap;
+margin-bottom: 20px;
+}
+
+/* ALERT */
+.alert {
+display: none;
+padding: 12px 20px;
+font-size: 13px;
+margin-bottom: 20px;
+border-left: 3px solid var(–ok);
+background: rgba(46,204,113,0.08);
+color: var(–ok);
+animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* DASHBOARD specific */
+.dash-grid {
+display: grid;
+grid-template-columns: 1fr 1fr 1fr;
+gap: 20px;
+margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+.dash-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 600px) {
+main { padding: 16px; }
+.tabs { padding: 0 16px; }
+header { padding: 0 16px; }
+.dash-grid { grid-template-columns: 1fr; }
+.form-row { grid-template-columns: 1fr; }
+}
+
+.category-header {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 14px;
+letter-spacing: 3px;
+padding: 8px 14px;
+margin-bottom: 12px;
+text-transform: uppercase;
+}
+
+.cat-reactive { background: rgba(232,64,64,0.1); color: var(–danger); border-left: 3px solid var(–danger); }
+.cat-proactive { background: rgba(52,152,219,0.1); color: var(–accent4); border-left: 3px solid var(–accent4); }
+.cat-gestao { background: rgba(46,204,113,0.1); color: var(–ok); border-left: 3px solid var(–ok); }
+
+.hours-display {
+font-family: ‘Bebas Neue’, sans-serif;
+font-size: 64px;
+color: var(–ok);
+line-height: 1;
+text-align: center;
+padding: 20px;
+}
+
+.hours-label {
+text-align: center;
+font-size: 11px;
+letter-spacing: 2px;
+text-transform: uppercase;
+color: var(–muted);
+margin-bottom: 12px;
+}
+
+.empty-state {
+text-align: center;
+padding: 48px 20px;
+color: var(–muted);
+font-size: 13px;
+}
+
+.empty-state .icon {
+font-size: 36px;
+margin-bottom: 12px;
+opacity: 0.4;
+}
+
+.stat-row {
+display: flex;
+justify-content: space-between;
+padding: 10px 0;
+border-bottom: 1px solid var(–border);
+font-size: 13px;
+}
+
+.stat-row:last-child { border-bottom: none; }
+.stat-val { font-family: ‘IBM Plex Mono’, monospace; font-weight: 500; color: var(–accent); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: var(–bg); }
+::-webkit-scrollbar-thumb { background: var(–border); }
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-badge">TST</div>
+    <div class="logo-text">
+      Controle Diário de<br>Segurança da Obra
+    </div>
+  </div>
+  <div class="header-right">
+    <span id="currentDate"></span>
+    <button class="btn btn-outline btn-sm" onclick="exportPDF()">⬇ PDF</button>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('dashboard')">Dashboard</div>
+  <div class="tab" onclick="switchTab('reativos')">⚠ Reativos</div>
+  <div class="tab" onclick="switchTab('epi')">🦺 EPI</div>
+  <div class="tab" onclick="switchTab('inspecoes')">🔍 Inspeções</div>
+  <div class="tab" onclick="switchTab('riscos')">🚨 Riscos Críticos</div>
+  <div class="tab" onclick="switchTab('gestao')">📋 Gestão</div>
+  <div class="tab" onclick="switchTab('historico')">📁 Histórico</div>
+</div>
+
+<main>
+
+<!-- ALERT -->
+
+<div class="alert" id="alert">✓ Registro salvo com sucesso.</div>
+
+<!-- ===================== DASHBOARD ===================== -->
+
+<div class="section active" id="sec-dashboard">
+  <div class="section-title">Dashboard</div>
+  <div class="section-sub">Visão geral do dia — atualizado em tempo real</div>
+
+  <div class="category-header cat-reactive">Indicadores Reativos</div>
+  <div class="kpi-grid" id="kpi-reactive">
+    <div class="kpi-card danger">
+      <div class="kpi-label">Nº Acidentes</div>
+      <div class="kpi-value" id="kpi-acidentes">0</div>
+      <div class="kpi-unit">registros</div>
+    </div>
+    <div class="kpi-card danger">
+      <div class="kpi-label">Taxa de Frequência</div>
+      <div class="kpi-value" id="kpi-tf">0,00</div>
+      <div class="kpi-unit">por 10⁶ HH</div>
+    </div>
+    <div class="kpi-card danger">
+      <div class="kpi-label">Taxa de Gravidade</div>
+      <div class="kpi-value" id="kpi-tg">0,00</div>
+      <div class="kpi-unit">por 10⁶ HH</div>
+    </div>
+  </div>
+
+  <div class="category-header cat-proactive">Indicadores Proativos</div>
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Inspeções</div>
+      <div class="kpi-value" id="kpi-inspecoes">0</div>
+      <div class="kpi-unit">realizadas</div>
+    </div>
+    <div class="kpi-card warning">
+      <div class="kpi-label">Irregul. EPI</div>
+      <div class="kpi-value" id="kpi-epi">0</div>
+      <div class="kpi-unit">registros</div>
+    </div>
+    <div class="kpi-card danger">
+      <div class="kpi-label">Riscos Críticos</div>
+      <div class="kpi-value" id="kpi-riscos">0</div>
+      <div class="kpi-unit">identificados</div>
+    </div>
+    <div class="kpi-card ok">
+      <div class="kpi-label">Tempo Médio Correção</div>
+      <div class="kpi-value" id="kpi-tempo">—</div>
+      <div class="kpi-unit">horas</div>
+    </div>
+  </div>
+
+  <div class="category-header cat-gestao">Gestão</div>
+  <div class="kpi-grid">
+    <div class="kpi-card ok">
+      <div class="kpi-label">DDS Realizados</div>
+      <div class="kpi-value" id="kpi-dds">0</div>
+      <div class="kpi-unit">hoje</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Treinamentos</div>
+      <div class="kpi-value" id="kpi-trein">0</div>
+      <div class="kpi-unit">hoje</div>
+    </div>
+    <div class="kpi-card ok">
+      <div class="kpi-label">Horas Sem Acidente</div>
+      <div class="kpi-value" id="kpi-hsa">0</div>
+      <div class="kpi-unit">horas acumuladas</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== REATIVOS ===================== -->
+
+<div class="section" id="sec-reativos">
+  <div class="section-title">Indicadores Reativos</div>
+  <div class="section-sub">Taxa de frequência, gravidade e registro de acidentes</div>
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot"></span>Parâmetros Base (Obra)</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Total de Trabalhadores</label>
+        <input type="number" id="r-trabalhadores" placeholder="ex: 120" oninput="calcIndicadores()">
+      </div>
+      <div class="form-group">
+        <label>Horas Trabalhadas (acumulado)</label>
+        <input type="number" id="r-hh" placeholder="ex: 48000" oninput="calcIndicadores()">
+      </div>
+      <div class="form-group">
+        <label>Dias Perdidos (acumulado)</label>
+        <input type="number" id="r-diasPerdidos" placeholder="ex: 0" oninput="calcIndicadores()">
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px">
+      <div class="panel" style="padding:16px;margin:0">
+        <div class="kpi-label">Taxa de Frequência</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--danger)" id="calc-tf">0,00</div>
+        <div class="kpi-unit">acidentes × 10⁶ / HH trabalhadas</div>
+      </div>
+      <div class="panel" style="padding:16px;margin:0">
+        <div class="kpi-label">Taxa de Gravidade</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--danger)" id="calc-tg">0,00</div>
+        <div class="kpi-unit">dias perdidos × 10⁶ / HH trabalhadas</div>
+      </div>
+      <div class="panel" style="padding:16px;margin:0">
+        <div class="kpi-label">Nº Acidentes</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--danger)" id="calc-nacc">0</div>
+        <div class="kpi-unit">registros no período</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--danger)"></span>Registrar Acidente</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data do Acidente</label>
+        <input type="date" id="r-data">
+      </div>
+      <div class="form-group">
+        <label>Trabalhador (Nome)</label>
+        <input type="text" id="r-nome" placeholder="Nome completo">
+      </div>
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" id="r-empresa" placeholder="Empresa / Subcontratada">
+      </div>
+      <div class="form-group">
+        <label>Tipo de Acidente</label>
+        <select id="r-tipo">
+          <option value="">Selecione</option>
+          <option>Queda de mesmo nível</option>
+          <option>Queda de altura</option>
+          <option>Choque elétrico</option>
+          <option>Corte / laceração</option>
+          <option>Esmagamento</option>
+          <option>Soterramento</option>
+          <option>Atropelamento</option>
+          <option>Queimadura</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Dias Perdidos</label>
+        <input type="number" id="r-diasAc" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Gravidade</label>
+        <select id="r-gravidade">
+          <option value="">Selecione</option>
+          <option>Sem afastamento</option>
+          <option>Com afastamento</option>
+          <option>Incapacidade permanente</option>
+          <option>Fatal</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Descrição / Causa</label>
+        <textarea id="r-descricao" placeholder="Descreva o acidente, causa provável e ação imediata tomada..."></textarea>
+      </div>
+    </div>
+    <button class="btn btn-danger" onclick="saveReativo()">Registrar Acidente</button>
+  </div>
+
+  <div class="table-wrap">
+    <table id="table-reativos">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Trabalhador</th>
+          <th>Empresa</th>
+          <th>Tipo</th>
+          <th>Gravidade</th>
+          <th>Dias Perdidos</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-reativos"><tr><td colspan="7" class="empty-state"><div class="icon">⚠️</div>Nenhum acidente registrado</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== EPI ===================== -->
+
+<div class="section" id="sec-epi">
+  <div class="section-title">Controle de EPI</div>
+  <div class="section-sub">Registro de não conformidades e uso correto de EPI/EPC</div>
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--warning)"></span>Registrar Irregularidade de EPI</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="e-data">
+      </div>
+      <div class="form-group">
+        <label>Período do Dia</label>
+        <select id="e-periodo">
+          <option value="">Selecione</option>
+          <option>Manhã (06h–12h)</option>
+          <option>Tarde (12h–18h)</option>
+          <option>Noite (18h–00h)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Empresa</label>
+        <input type="text" id="e-empresa" placeholder="Empresa / Subcontratada">
+      </div>
+      <div class="form-group">
+        <label>Nome do Trabalhador</label>
+        <input type="text" id="e-nome" placeholder="Nome completo">
+      </div>
+      <div class="form-group">
+        <label>Função</label>
+        <input type="text" id="e-funcao" placeholder="ex: Carpinteiro">
+      </div>
+      <div class="form-group">
+        <label>Notificação Formal Aplicada?</label>
+        <div class="toggle-group">
+          <button class="toggle-btn" id="toggle-notif-sim" onclick="setToggle('notif','sim')">✓ Sim</button>
+          <button class="toggle-btn" id="toggle-notif-nao" onclick="setToggle('notif','nao')">✗ Não</button>
+        </div>
+      </div>
+      <div class="form-group full">
+        <label>EPI / EPC não utilizado ou inadequado</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px" id="epi-checkboxes">
+        </div>
+      </div>
+      <div class="form-group full">
+        <label>Observações</label>
+        <textarea id="e-obs" placeholder="Detalhe a situação encontrada..."></textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveEPI()">Salvar Registro EPI</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Período</th>
+          <th>Empresa</th>
+          <th>Trabalhador</th>
+          <th>EPI/EPC</th>
+          <th>Notificado</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-epi"><tr><td colspan="7" class="empty-state"><div class="icon">🦺</div>Nenhuma irregularidade registrada</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== INSPEÇÕES ===================== -->
+
+<div class="section" id="sec-inspecoes">
+  <div class="section-title">Inspeções de Segurança</div>
+  <div class="section-sub">Registro de inspeções proativas realizadas na obra</div>
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--accent4)"></span>Nova Inspeção</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="i-data">
+      </div>
+      <div class="form-group">
+        <label>Responsável pela Inspeção</label>
+        <input type="text" id="i-responsavel" placeholder="Nome do inspetor">
+      </div>
+      <div class="form-group">
+        <label>Área / Local Inspecionado</label>
+        <input type="text" id="i-area" placeholder="ex: Bloco A – 4º andar">
+      </div>
+      <div class="form-group">
+        <label>Tipo de Inspeção</label>
+        <select id="i-tipo">
+          <option value="">Selecione</option>
+          <option>Inspeção de rotina</option>
+          <option>Inspeção programada</option>
+          <option>Inspeção de EPI</option>
+          <option>Inspeção de andaimes</option>
+          <option>Inspeção elétrica</option>
+          <option>Inspeção de máquinas</option>
+          <option>Inspeção geral</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Nº Não Conformidades Encontradas</label>
+        <input type="number" id="i-nc" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="i-status">
+          <option>Concluída</option>
+          <option>Em andamento</option>
+          <option>Pendente</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Observações / Achados</label>
+        <textarea id="i-obs" placeholder="Descreva os achados da inspeção..."></textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveInspecao()">Registrar Inspeção</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Responsável</th>
+          <th>Área</th>
+          <th>Tipo</th>
+          <th>NC Encontradas</th>
+          <th>Status</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-inspecoes"><tr><td colspan="7" class="empty-state"><div class="icon">🔍</div>Nenhuma inspeção registrada</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== RISCOS ===================== -->
+
+<div class="section" id="sec-riscos">
+  <div class="section-title">Riscos Críticos</div>
+  <div class="section-sub">Identificação e controle de riscos críticos com tempo de correção</div>
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--danger)"></span>Registrar Risco Crítico</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data de Identificação</label>
+        <input type="date" id="rc-data">
+      </div>
+      <div class="form-group">
+        <label>Local / Área</label>
+        <input type="text" id="rc-local" placeholder="ex: Escavação – Setor 2">
+      </div>
+      <div class="form-group">
+        <label>Tipo de Risco</label>
+        <select id="rc-tipo">
+          <option value="">Selecione</option>
+          <option>Queda de altura</option>
+          <option>Soterramento</option>
+          <option>Risco elétrico</option>
+          <option>Explosão / incêndio</option>
+          <option>Atropelamento</option>
+          <option>Desmoronamento</option>
+          <option>Químico</option>
+          <option>Ergonômico grave</option>
+          <option>Outro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Severidade</label>
+        <select id="rc-severidade">
+          <option>Crítico</option>
+          <option>Alto</option>
+          <option>Médio</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Responsável pela Correção</label>
+        <input type="text" id="rc-resp" placeholder="Nome do responsável">
+      </div>
+      <div class="form-group">
+        <label>Prazo para Correção</label>
+        <input type="date" id="rc-prazo">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="rc-status">
+          <option>Aberto</option>
+          <option>Em correção</option>
+          <option>Corrigido</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Data de Correção</label>
+        <input type="date" id="rc-datacorr">
+      </div>
+      <div class="form-group full">
+        <label>Descrição do Risco / Ação Corretiva</label>
+        <textarea id="rc-desc" placeholder="Descreva detalhadamente o risco e a ação corretiva prevista..."></textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveRisco()">Registrar Risco</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Local</th>
+          <th>Tipo</th>
+          <th>Severidade</th>
+          <th>Responsável</th>
+          <th>Prazo</th>
+          <th>Status</th>
+          <th>T. Correção</th>
+          <th>Ação</th>
+        </tr>
+      </thead>
+      <tbody id="tbody-riscos"><tr><td colspan="9" class="empty-state"><div class="icon">🚨</div>Nenhum risco crítico registrado</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== GESTÃO ===================== -->
+
+<div class="section" id="sec-gestao">
+  <div class="section-title">Gestão</div>
+  <div class="section-sub">DDS, treinamentos e horas sem acidente</div>
+
+  <!-- Horas sem acidente -->
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--ok)"></span>Horas Sem Acidente</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data de Início (último acidente ou início da obra)</label>
+        <input type="date" id="g-inicio" oninput="calcHSA()">
+      </div>
+      <div class="form-group">
+        <label>Trabalhadores (média)</label>
+        <input type="number" id="g-trab" placeholder="ex: 120" oninput="calcHSA()">
+      </div>
+      <div class="form-group">
+        <label>Horas/Dia/Trabalhador</label>
+        <input type="number" id="g-hpd" placeholder="ex: 8" oninput="calcHSA()">
+      </div>
+    </div>
+    <div class="hours-label">HORAS SEM ACIDENTE</div>
+    <div class="hours-display" id="hsa-display">0</div>
+    <div style="text-align:center;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:4px" id="hsa-dias">0 dias</div>
+  </div>
+
+  <!-- DDS -->
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--ok)"></span>Registrar DDS</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="dds-data">
+      </div>
+      <div class="form-group">
+        <label>Responsável / Ministrador</label>
+        <input type="text" id="dds-resp" placeholder="Nome">
+      </div>
+      <div class="form-group">
+        <label>Tema do DDS</label>
+        <input type="text" id="dds-tema" placeholder="ex: Uso correto de EPI">
+      </div>
+      <div class="form-group">
+        <label>Nº Participantes</label>
+        <input type="number" id="dds-part" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Duração (min)</label>
+        <input type="number" id="dds-dur" placeholder="ex: 15">
+      </div>
+      <div class="form-group full">
+        <label>Observações</label>
+        <textarea id="dds-obs" placeholder="Conteúdo abordado, participações, etc."></textarea>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveDDS()">Registrar DDS</button>
+  </div>
+  <div class="table-wrap" style="margin-bottom:24px">
+    <table>
+      <thead>
+        <tr><th>Data</th><th>Responsável</th><th>Tema</th><th>Participantes</th><th>Duração</th><th>Ação</th></tr>
+      </thead>
+      <tbody id="tbody-dds"><tr><td colspan="6" class="empty-state"><div class="icon">📢</div>Nenhum DDS registrado</td></tr></tbody>
+    </table>
+  </div>
+
+  <!-- Treinamentos -->
+
+  <div class="panel">
+    <div class="panel-title"><span class="dot" style="background:var(--accent4)"></span>Registrar Treinamento</div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="tr-data">
+      </div>
+      <div class="form-group">
+        <label>Treinamento</label>
+        <input type="text" id="tr-nome" placeholder="ex: NR-35 Trabalho em Altura">
+      </div>
+      <div class="form-group">
+        <label>Instrutor</label>
+        <input type="text" id="tr-instrutor" placeholder="Nome">
+      </div>
+      <div class="form-group">
+        <label>Nº Treinados</label>
+        <input type="number" id="tr-qtd" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label>Carga Horária (h)</label>
+        <input type="number" id="tr-ch" placeholder="ex: 8">
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="tr-status">
+          <option>Concluído</option>
+          <option>Em andamento</option>
+          <option>Planejado</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="saveTreinamento()">Registrar Treinamento</button>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Data</th><th>Treinamento</th><th>Instrutor</th><th>Treinados</th><th>CH</th><th>Status</th><th>Ação</th></tr>
+      </thead>
+      <tbody id="tbody-trein"><tr><td colspan="7" class="empty-state"><div class="icon">📚</div>Nenhum treinamento registrado</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ===================== HISTÓRICO ===================== -->
+
+<div class="section" id="sec-historico">
+  <div class="section-title">Histórico Geral</div>
+  <div class="section-sub">Todos os registros — exporte para PDF</div>
+
+  <div class="actions-row">
+    <button class="btn btn-primary" onclick="exportPDF()">⬇ Exportar Relatório PDF</button>
+    <button class="btn btn-outline" onclick="exportJSON()">⬇ Exportar JSON (Backup)</button>
+    <button class="btn btn-outline" onclick="importJSON()">⬆ Importar JSON (Backup)</button>
+    <button class="btn btn-danger btn-sm" onclick="clearAll()">🗑 Limpar Todos os Dados</button>
+  </div>
+
+  <div id="historico-content"></div>
+</div>
+
+</main>
+
+<script>
+// =================== DATA STORE ===================
+function loadDB() {
+  try {
+    const saved = localStorage.getItem('tst_seguranca_db');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return { reativos: [], epi: [], inspecoes: [], riscos: [], dds: [], treinamentos: [], params: {} };
+}
+
+function saveDB() {
+  try { localStorage.setItem('tst_seguranca_db', JSON.stringify(DB)); } catch(e) {}
+}
+
+const DB = loadDB();
+
+const EPIS = [
+  'Capacete','Botina','Luva','Óculos','Protetor Auricular',
+  'Cinto Talabarte','Máscara PFF2','Colete Refletivo','Manga',
+  'Avental','EPC – Guarda-corpo','EPC – Tela de Proteção','EPC – Sinalização'
+];
+
+// Build EPI checkboxes
+function buildEPIChecks(){
+  const c = document.getElementById('epi-checkboxes');
+  c.innerHTML = EPIS.map(e=>`
+    <label style="display:flex;align-items:center;gap:6px;padding:6px 12px;background:var(--surface2);border:1px solid var(--border);cursor:pointer;font-size:12px;text-transform:none;letter-spacing:0;color:var(--text)">
+      <input type="checkbox" value="${e}" style="width:14px;height:14px;border:none;background:none"> ${e}
+    </label>`).join('');
+}
+buildEPIChecks();
+
+// =================== UTILS ===================
+let notifToggle = '';
+function setToggle(id, val){
+  notifToggle = val;
+  document.getElementById(`toggle-notif-sim`).className = 'toggle-btn' + (val==='sim' ? ' active-yes' : '');
+  document.getElementById(`toggle-notif-nao`).className = 'toggle-btn' + (val==='nao' ? ' active-no' : '');
+}
+
+function today(){
+  return new Date().toISOString().split('T')[0];
+}
+
+function fmtDate(d){
+  if(!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function showAlert(msg='✓ Registro salvo com sucesso.'){
+  const a = document.getElementById('alert');
+  a.textContent = msg;
+  a.style.display = 'block';
+  setTimeout(()=>{ a.style.display='none'; }, 3000);
+}
+
+function initDates(){
+  document.querySelectorAll('input[type=date]').forEach(i=>{ if(!i.value) i.value=today(); });
+}
+initDates();
+
+// =================== TABS ===================
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach((t,i)=>{
+    const names = ['dashboard','reativos','epi','inspecoes','riscos','gestao','historico'];
+    t.classList.toggle('active', names[i]===name);
+  });
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  if(name==='historico') renderHistorico();
+  updateDashboard();
+}
+
+// =================== DATE HEADER ===================
+function updateDateHeader(){
+  const d = new Date();
+  const opts = { weekday:'long', year:'numeric', month:'long', day:'numeric' };
+  document.getElementById('currentDate').textContent = d.toLocaleDateString('pt-BR', opts).toUpperCase();
+}
+updateDateHeader();
+
+// =================== REATIVOS ===================
+function calcIndicadores(){
+  const hh = parseFloat(document.getElementById('r-hh').value)||0;
+  const nacc = DB.reativos.length;
+  const dias = DB.reativos.reduce((s,r)=>s+(parseFloat(r.diasPerdidos)||0),0) + (parseFloat(document.getElementById('r-diasPerdidos').value)||0);
+  const tf = hh>0 ? (nacc*1e6/hh) : 0;
+  const tg = hh>0 ? (dias*1e6/hh) : 0;
+  document.getElementById('calc-tf').textContent = tf.toFixed(2).replace('.',',');
+  document.getElementById('calc-tg').textContent = tg.toFixed(2).replace('.',',');
+  document.getElementById('calc-nacc').textContent = nacc;
+  DB.params = {...DB.params, hh: document.getElementById('r-hh').value, diasPerdidos: document.getElementById('r-diasPerdidos').value};
+  saveDB();
+}
+
+function saveReativo(){
+  const obj = {
+    id: Date.now(),
+    data: document.getElementById('r-data').value,
+    nome: document.getElementById('r-nome').value,
+    empresa: document.getElementById('r-empresa').value,
+    tipo: document.getElementById('r-tipo').value,
+    diasPerdidos: document.getElementById('r-diasAc').value||'0',
+    gravidade: document.getElementById('r-gravidade').value,
+    descricao: document.getElementById('r-descricao').value,
+  };
+  if(!obj.nome||!obj.tipo){ alert('Preencha o nome e tipo de acidente.'); return; }
+  DB.reativos.push(obj);
+  saveDB();
+  renderReativos();
+  calcIndicadores();
+  updateDashboard();
+  showAlert('✓ Acidente registrado.');
+  ['r-nome','r-empresa','r-diasAc','r-descricao'].forEach(id=>document.getElementById(id).value='');
+}
+
+function renderReativos(){
+  const tb = document.getElementById('tbody-reativos');
+  if(!DB.reativos.length){ tb.innerHTML='<tr><td colspan="7" class="empty-state"><div class="icon">⚠️</div>Nenhum acidente registrado</td></tr>'; return; }
+  tb.innerHTML = DB.reativos.map(r=>`
+    <tr>
+      <td>${fmtDate(r.data)}</td>
+      <td>${r.nome}</td>
+      <td>${r.empresa||'—'}</td>
+      <td>${r.tipo}</td>
+      <td><span class="badge ${r.gravidade==='Fatal'?'badge-danger':r.gravidade==='Com afastamento'?'badge-warn':'badge-ok'}">${r.gravidade}</span></td>
+      <td>${r.diasPerdidos}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="del('reativos',${r.id})">Excluir</button></td>
+    </tr>`).join('');
+}
+
+// =================== EPI ===================
+function saveEPI(){
+  const epis = [...document.querySelectorAll('#epi-checkboxes input:checked')].map(c=>c.value);
+  const obj = {
+    id: Date.now(),
+    data: document.getElementById('e-data').value,
+    periodo: document.getElementById('e-periodo').value,
+    empresa: document.getElementById('e-empresa').value,
+    nome: document.getElementById('e-nome').value,
+    funcao: document.getElementById('e-funcao').value,
+    notificado: notifToggle,
+    epis: epis.join(', ')||'—',
+    obs: document.getElementById('e-obs').value,
+  };
+  if(!obj.nome){ alert('Preencha o nome do trabalhador.'); return; }
+  DB.epi.push(obj);
+  saveDB();
+  renderEPI();
+  updateDashboard();
+  showAlert('✓ Registro EPI salvo.');
+  ['e-empresa','e-nome','e-funcao','e-obs'].forEach(id=>document.getElementById(id).value='');
+  document.querySelectorAll('#epi-checkboxes input').forEach(c=>c.checked=false);
+  notifToggle='';
+  ['toggle-notif-sim','toggle-notif-nao'].forEach(id=>document.getElementById(id).className='toggle-btn');
+}
+
+function renderEPI(){
+  const tb = document.getElementById('tbody-epi');
+  if(!DB.epi.length){ tb.innerHTML='<tr><td colspan="7" class="empty-state"><div class="icon">🦺</div>Nenhuma irregularidade registrada</td></tr>'; return; }
+  tb.innerHTML = DB.epi.map(e=>`
+    <tr>
+      <td>${fmtDate(e.data)}</td>
+      <td>${e.periodo||'—'}</td>
+      <td>${e.empresa||'—'}</td>
+      <td>${e.nome}</td>
+      <td style="max-width:200px;word-wrap:break-word">${e.epis}</td>
+      <td><span class="badge ${e.notificado==='sim'?'badge-danger':'badge-warn'}">${e.notificado==='sim'?'Sim':'Não'}</span></td>
+      <td><button class="btn btn-sm btn-danger" onclick="del('epi',${e.id})">Excluir</button></td>
+    </tr>`).join('');
+}
+
+// =================== INSPEÇÕES ===================
+function saveInspecao(){
+  const obj = {
+    id: Date.now(),
+    data: document.getElementById('i-data').value,
+    responsavel: document.getElementById('i-responsavel').value,
+    area: document.getElementById('i-area').value,
+    tipo: document.getElementById('i-tipo').value,
+    nc: document.getElementById('i-nc').value||'0',
+    status: document.getElementById('i-status').value,
+    obs: document.getElementById('i-obs').value,
+  };
+  if(!obj.responsavel){ alert('Preencha o responsável.'); return; }
+  DB.inspecoes.push(obj);
+  saveDB();
+  renderInspecoes();
+  updateDashboard();
+  showAlert('✓ Inspeção registrada.');
+  ['i-responsavel','i-area','i-nc','i-obs'].forEach(id=>document.getElementById(id).value='');
+}
+
+function renderInspecoes(){
+  const tb = document.getElementById('tbody-inspecoes');
+  if(!DB.inspecoes.length){ tb.innerHTML='<tr><td colspan="7" class="empty-state"><div class="icon">🔍</div>Nenhuma inspeção registrada</td></tr>'; return; }
+  tb.innerHTML = DB.inspecoes.map(i=>`
+    <tr>
+      <td>${fmtDate(i.data)}</td>
+      <td>${i.responsavel}</td>
+      <td>${i.area||'—'}</td>
+      <td>${i.tipo||'—'}</td>
+      <td>${i.nc}</td>
+      <td><span class="badge ${i.status==='Concluída'?'badge-ok':i.status==='Em andamento'?'badge-warn':'badge-danger'}">${i.status}</span></td>
+      <td><button class="btn btn-sm btn-danger" onclick="del('inspecoes',${i.id})">Excluir</button></td>
+    </tr>`).join('');
+}
+
+// =================== RISCOS ===================
+function saveRisco(){
+  const obj = {
+    id: Date.now(),
+    data: document.getElementById('rc-data').value,
+    local: document.getElementById('rc-local').value,
+    tipo: document.getElementById('rc-tipo').value,
+    severidade: document.getElementById('rc-severidade').value,
+    responsavel: document.getElementById('rc-resp').value,
+    prazo: document.getElementById('rc-prazo').value,
+    status: document.getElementById('rc-status').value,
+    dataCorrn: document.getElementById('rc-datacorr').value,
+    desc: document.getElementById('rc-desc').value,
+  };
+  if(!obj.local||!obj.tipo){ alert('Preencha local e tipo de risco.'); return; }
+  DB.riscos.push(obj);
+  saveDB();
+  renderRiscos();
+  updateDashboard();
+  showAlert('✓ Risco crítico registrado.');
+  ['rc-local','rc-resp','rc-desc'].forEach(id=>document.getElementById(id).value='');
+}
+
+function calcTempoCorrecao(r){
+  if(r.status==='Corrigido' && r.data && r.dataCorrn){
+    const ms = new Date(r.dataCorrn)-new Date(r.data);
+    const hrs = Math.round(ms/36e5);
+    return hrs+'h';
+  }
+  return '—';
+}
+
+function renderRiscos(){
+  const tb = document.getElementById('tbody-riscos');
+  if(!DB.riscos.length){ tb.innerHTML='<tr><td colspan="9" class="empty-state"><div class="icon">🚨</div>Nenhum risco crítico registrado</td></tr>'; return; }
+  tb.innerHTML = DB.riscos.map(r=>`
+    <tr>
+      <td>${fmtDate(r.data)}</td>
+      <td>${r.local}</td>
+      <td>${r.tipo}</td>
+      <td><span class="badge ${r.severidade==='Crítico'?'badge-danger':r.severidade==='Alto'?'badge-warn':'badge-ok'}">${r.severidade}</span></td>
+      <td>${r.responsavel||'—'}</td>
+      <td>${fmtDate(r.prazo)}</td>
+      <td><span class="badge ${r.status==='Corrigido'?'badge-ok':r.status==='Em correção'?'badge-warn':'badge-danger'}">${r.status}</span></td>
+      <td>${calcTempoCorrecao(r)}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="del('riscos',${r.id})">Excluir</button></td>
+    </tr>`).join('');
+}
+
+// =================== DDS ===================
+function saveDDS(){
+  const obj = {
+    id: Date.now(),
+    data: document.getElementById('dds-data').value,
+    responsavel: document.getElementById('dds-resp').value,
+    tema: document.getElementById('dds-tema').value,
+    participantes: document.getElementById('dds-part').value||'0',
+    duracao: document.getElementById('dds-dur').value||'—',
+    obs: document.getElementById('dds-obs').value,
+  };
+  if(!obj.tema){ alert('Preencha o tema do DDS.'); return; }
+  DB.dds.push(obj);
+  saveDB();
+  renderDDS();
+  updateDashboard();
+  showAlert('✓ DDS registrado.');
+  ['dds-resp','dds-tema','dds-part','dds-dur','dds-obs'].forEach(id=>document.getElementById(id).value='');
+}
+
+function renderDDS(){
+  const tb = document.getElementById('tbody-dds');
+  if(!DB.dds.length){ tb.innerHTML='<tr><td colspan="6" class="empty-state"><div class="icon">📢</div>Nenhum DDS registrado</td></tr>'; return; }
+  tb.innerHTML = DB.dds.map(d=>`
+    <tr>
+      <td>${fmtDate(d.data)}</td>
+      <td>${d.responsavel||'—'}</td>
+      <td>${d.tema}</td>
+      <td>${d.participantes}</td>
+      <td>${d.duracao} min</td>
+      <td><button class="btn btn-sm btn-danger" onclick="del('dds',${d.id})">Excluir</button></td>
+    </tr>`).join('');
+}
+
+// =================== TREINAMENTOS ===================
+function saveTreinamento(){
+  const obj = {
+    id: Date.now(),
+    data: document.getElementById('tr-data').value,
+    nome: document.getElementById('tr-nome').value,
+    instrutor: document.getElementById('tr-instrutor').value,
+    qtd: document.getElementById('tr-qtd').value||'0',
+    ch: document.getElementById('tr-ch').value||'—',
+    status: document.getElementById('tr-status').value,
+  };
+  if(!obj.nome){ alert('Preencha o nome do treinamento.'); return; }
+  DB.treinamentos.push(obj);
+  saveDB();
+  renderTreinamentos();
+  updateDashboard();
+  showAlert('✓ Treinamento registrado.');
+  ['tr-nome','tr-instrutor','tr-qtd','tr-ch'].forEach(id=>document.getElementById(id).value='');
+}
+
+function renderTreinamentos(){
+  const tb = document.getElementById('tbody-trein');
+  if(!DB.treinamentos.length){ tb.innerHTML='<tr><td colspan="7" class="empty-state"><div class="icon">📚</div>Nenhum treinamento registrado</td></tr>'; return; }
+  tb.innerHTML = DB.treinamentos.map(t=>`
+    <tr>
+      <td>${fmtDate(t.data)}</td>
+      <td>${t.nome}</td>
+      <td>${t.instrutor||'—'}</td>
+      <td>${t.qtd}</td>
+      <td>${t.ch}h</td>
+      <td><span class="badge ${t.status==='Concluído'?'badge-ok':t.status==='Em andamento'?'badge-warn':'badge-danger'}">${t.status}</span></td>
+      <td><button class="btn btn-sm btn-danger" onclick="del('treinamentos',${t.id})">Excluir</button></td>
+    </tr>`).join('');
+}
+
+// =================== HSA ===================
+function calcHSA(){
+  const inicio = document.getElementById('g-inicio').value;
+  const trab = parseFloat(document.getElementById('g-trab').value)||0;
+  const hpd = parseFloat(document.getElementById('g-hpd').value)||8;
+  DB.params = { inicio, trab, hpd };
+  saveDB();
+  if(!inicio||!trab){ document.getElementById('hsa-display').textContent='0'; document.getElementById('hsa-dias').textContent='0 dias'; return; }
+  const dias = Math.floor((Date.now()-new Date(inicio))/(864e5));
+  const horas = dias*trab*hpd;
+  document.getElementById('hsa-display').textContent = horas.toLocaleString('pt-BR');
+  document.getElementById('hsa-dias').textContent = `${dias} dias`;
+  document.getElementById('kpi-hsa').textContent = horas.toLocaleString('pt-BR');
+}
+
+// =================== DELETE ===================
+function del(table, id){
+  if(!confirm('Excluir registro?')) return;
+  DB[table] = DB[table].filter(r=>r.id!==id);
+  saveDB();
+  const renders = { reativos: renderReativos, epi: renderEPI, inspecoes: renderInspecoes, riscos: renderRiscos, dds: renderDDS, treinamentos: renderTreinamentos };
+  renders[table]();
+  calcIndicadores();
+  updateDashboard();
+}
+
+// =================== DASHBOARD ===================
+function updateDashboard(){
+  const hh = parseFloat(document.getElementById('r-hh').value)||0;
+  const nacc = DB.reativos.length;
+  const dias = DB.reativos.reduce((s,r)=>s+(parseFloat(r.diasPerdidos)||0),0);
+  const tf = hh>0 ? (nacc*1e6/hh).toFixed(2).replace('.',',') : '0,00';
+  const tg = hh>0 ? (dias*1e6/hh).toFixed(2).replace('.',',') : '0,00';
+  document.getElementById('kpi-acidentes').textContent = nacc;
+  document.getElementById('kpi-tf').textContent = tf;
+  document.getElementById('kpi-tg').textContent = tg;
+  document.getElementById('kpi-inspecoes').textContent = DB.inspecoes.length;
+  document.getElementById('kpi-epi').textContent = DB.epi.length;
+  document.getElementById('kpi-riscos').textContent = DB.riscos.filter(r=>r.status!=='Corrigido').length;
+  document.getElementById('kpi-dds').textContent = DB.dds.length;
+  document.getElementById('kpi-trein').textContent = DB.treinamentos.length;
+
+  // Tempo médio correção
+  const corrigidos = DB.riscos.filter(r=>r.status==='Corrigido'&&r.data&&r.dataCorrn);
+  if(corrigidos.length){
+    const avg = corrigidos.reduce((s,r)=>s+(new Date(r.dataCorrn)-new Date(r.data)),0)/corrigidos.length/36e5;
+    document.getElementById('kpi-tempo').textContent = Math.round(avg)+'h';
+  }
+}
+
+// =================== HISTÓRICO ===================
+function renderHistorico(){
+  const el = document.getElementById('historico-content');
+  const sections = [
+    { title:'Acidentes Registrados', data: DB.reativos, cols:['Data','Trabalhador','Empresa','Tipo','Gravidade','Dias Perdidos'], row: r=>[fmtDate(r.data),r.nome,r.empresa||'—',r.tipo,r.gravidade,r.diasPerdidos] },
+    { title:'Irregularidades EPI', data: DB.epi, cols:['Data','Período','Empresa','Trabalhador','EPI/EPC','Notificado'], row: r=>[fmtDate(r.data),r.periodo||'—',r.empresa||'—',r.nome,r.epis,r.notificado==='sim'?'Sim':'Não'] },
+    { title:'Inspeções', data: DB.inspecoes, cols:['Data','Responsável','Área','Tipo','NC','Status'], row: r=>[fmtDate(r.data),r.responsavel,r.area||'—',r.tipo||'—',r.nc,r.status] },
+    { title:'Riscos Críticos', data: DB.riscos, cols:['Data','Local','Tipo','Severidade','Status','T. Correção'], row: r=>[fmtDate(r.data),r.local,r.tipo,r.severidade,r.status,calcTempoCorrecao(r)] },
+    { title:'DDS Realizados', data: DB.dds, cols:['Data','Responsável','Tema','Participantes'], row: r=>[fmtDate(r.data),r.responsavel||'—',r.tema,r.participantes] },
+    { title:'Treinamentos', data: DB.treinamentos, cols:['Data','Treinamento','Instrutor','Treinados','CH','Status'], row: r=>[fmtDate(r.data),r.nome,r.instrutor||'—',r.qtd,r.ch+'h',r.status] },
+  ];
+
+  el.innerHTML = sections.map(s=>`
+    <div class="panel">
+      <div class="panel-title"><span class="dot"></span>${s.title} (${s.data.length})</div>
+      ${s.data.length===0 ? '<div class="empty-state">Nenhum registro</div>' : `
+      <div class="table-wrap"><table>
+        <thead><tr>${s.cols.map(c=>`<th>${c}</th>`).join('')}</tr></thead>
+        <tbody>${s.data.map(r=>`<tr>${s.row(r).map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</tbody>
+      </table></div>`}
+    </div>`).join('');
+}
+
+// =================== PDF ===================
+function exportPDF(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const today_str = new Date().toLocaleDateString('pt-BR');
+  let y = 20;
+
+  // Header
+  doc.setFillColor(245,166,35);
+  doc.rect(0,0,210,16,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(14);
+  doc.setTextColor(0,0,0);
+  doc.text('TST — CONTROLE DIÁRIO DE SEGURANÇA DA OBRA', 105, 11, {align:'center'});
+  doc.setFontSize(9);
+  doc.setTextColor(80,80,80);
+  doc.text(`Gerado em: ${today_str}`, 105, 22, {align:'center'});
+  y = 30;
+
+  function addSection(title, headers, rows, color=[52,152,219]){
+    if(y > 250){ doc.addPage(); y = 20; }
+    doc.setFillColor(...color);
+    doc.rect(14, y, 182, 7, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(9);
+    doc.setTextColor(255,255,255);
+    doc.text(title.toUpperCase(), 17, y+5);
+    y += 10;
+
+    if(!rows.length){
+      doc.setFont('helvetica','italic');
+      doc.setFontSize(8);
+      doc.setTextColor(150,150,150);
+      doc.text('Nenhum registro.', 17, y+4);
+      y += 10; return;
+    }
+
+    // Header row
+    doc.setFillColor(40,40,50);
+    doc.rect(14, y, 182, 6, 'F');
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(7.5);
+    doc.setTextColor(255,255,255);
+    const colW = 182/headers.length;
+    headers.forEach((h,i)=>doc.text(h, 14+i*colW+1, y+4.5));
+    y += 6;
+
+    rows.forEach((row,ri)=>{
+      if(y>275){ doc.addPage(); y=20; }
+      doc.setFillColor(ri%2===0?248:255, ri%2===0?248:255, ri%2===0?250:255);
+      doc.rect(14,y,182,6,'F');
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(7);
+      doc.setTextColor(30,30,30);
+      row.forEach((cell,i)=>{
+        const txt = String(cell||'—');
+        doc.text(txt.substring(0,20), 14+i*colW+1, y+4.5);
+      });
+      y += 6;
+    });
+    y += 8;
+  }
+
+  const hh = parseFloat(document.getElementById('r-hh').value)||0;
+  const nacc = DB.reativos.length;
+  const dias = DB.reativos.reduce((s,r)=>s+(parseFloat(r.diasPerdidos)||0),0);
+  const tf = hh>0 ? (nacc*1e6/hh).toFixed(2) : '0,00';
+  const tg = hh>0 ? (dias*1e6/hh).toFixed(2) : '0,00';
+
+  // Summary box
+  doc.setFillColor(19,22,30);
+  doc.rect(14,y,182,32,'F');
+  doc.setFont('helvetica','bold');
+  doc.setFontSize(8);
+  doc.setTextColor(245,166,35);
+  doc.text('RESUMO EXECUTIVO', 17, y+7);
+  doc.setTextColor(200,210,230);
+  doc.setFontSize(7.5);
+  const sumData = [
+    ['Acidentes',nacc],['Taxa Frequência',tf],['Taxa Gravidade',tg],
+    ['Inspeções',DB.inspecoes.length],['Irr. EPI',DB.epi.length],
+    ['Riscos Críticos',DB.riscos.filter(r=>r.status!=='Corrigido').length],
+    ['DDS',DB.dds.length],['Treinamentos',DB.treinamentos.length],
+  ];
+  sumData.forEach((s,i)=>{
+    const cx = 17 + (i%4)*46;
+    const cy = y + 15 + Math.floor(i/4)*10;
+    doc.setTextColor(150,160,180);
+    doc.text(s[0], cx, cy);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(10);
+    doc.setTextColor(245,166,35);
+    doc.text(String(s[1]), cx, cy+6);
+    doc.setFont('helvetica','normal');
+    doc.setFontSize(7.5);
+  });
+  y += 38;
+
+  addSection('Acidentes Registrados',
+    ['Data','Trabalhador','Empresa','Tipo','Gravidade','Dias'],
+    DB.reativos.map(r=>[fmtDate(r.data),r.nome,r.empresa||'—',r.tipo,r.gravidade,r.diasPerdidos]),
+    [232,64,64]);
+
+  addSection('Irregularidades EPI',
+    ['Data','Período','Empresa','Trabalhador','EPI/EPC','Notif.'],
+    DB.epi.map(r=>[fmtDate(r.data),r.periodo||'—',r.empresa||'—',r.nome,r.epis,r.notificado==='sim'?'Sim':'Não']),
+    [245,166,35]);
+
+  addSection('Inspeções de Segurança',
+    ['Data','Responsável','Área','Tipo','NC','Status'],
+    DB.inspecoes.map(r=>[fmtDate(r.data),r.responsavel,r.area||'—',r.tipo||'—',r.nc,r.status]),
+    [52,152,219]);
+
+  addSection('Riscos Críticos',
+    ['Data','Local','Tipo','Severidade','Status','T.Correção'],
+    DB.riscos.map(r=>[fmtDate(r.data),r.local,r.tipo,r.severidade,r.status,calcTempoCorrecao(r)]),
+    [232,64,64]);
+
+  addSection('DDS Realizados',
+    ['Data','Responsável','Tema','Participantes','Duração'],
+    DB.dds.map(r=>[fmtDate(r.data),r.responsavel||'—',r.tema,r.participantes,r.duracao+' min']),
+    [46,204,113]);
+
+  addSection('Treinamentos',
+    ['Data','Treinamento','Instrutor','Treinados','CH','Status'],
+    DB.treinamentos.map(r=>[fmtDate(r.data),r.nome,r.instrutor||'—',r.qtd,r.ch+'h',r.status]),
+    [52,152,219]);
+
+  // Footer
+  const pages = doc.internal.getNumberOfPages();
+  for(let i=1;i<=pages;i++){
+    doc.setPage(i);
+    doc.setFontSize(7);
+    doc.setTextColor(100,100,100);
+    doc.text(`TST Segurança da Obra — ${today_str} — Página ${i}/${pages}`, 105, 292, {align:'center'});
+  }
+
+  doc.save(`TST_Seguranca_${today_str.replace(/\//g,'-')}.pdf`);
+}
+
+// =================== EXPORT JSON ===================
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(DB, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url; a.download=`TST_backup_${today()}.json`; a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importJSON(){
+  const input = document.createElement('input');
+  input.type='file'; input.accept='.json';
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      try {
+        const imported = JSON.parse(ev.target.result);
+        if(!imported.reativos) throw new Error();
+        Object.assign(DB, imported);
+        saveDB();
+        renderReativos(); renderEPI(); renderInspecoes(); renderRiscos(); renderDDS(); renderTreinamentos();
+        if(DB.params.hh) document.getElementById('r-hh').value = DB.params.hh;
+        if(DB.params.inicio) document.getElementById('g-inicio').value = DB.params.inicio;
+        if(DB.params.trab) document.getElementById('g-trab').value = DB.params.trab;
+        if(DB.params.hpd) document.getElementById('g-hpd').value = DB.params.hpd;
+        calcIndicadores(); calcHSA(); updateDashboard();
+        showAlert('✓ Backup importado com sucesso!');
+      } catch { alert('Arquivo JSON inválido.'); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+
+function clearAll(){
+  if(!confirm('Tem certeza? Todos os dados serão apagados permanentemente.')) return;
+  Object.keys(DB).forEach(k=>{ DB[k]=[]; });
+  DB.params = {};
+  saveDB();
+  renderReativos(); renderEPI(); renderInspecoes(); renderRiscos(); renderDDS(); renderTreinamentos();
+  updateDashboard();
+  showAlert('✓ Dados apagados.');
+}
+
+// Init
+updateDashboard();
+
+// Restore saved data
+(function restoreAll(){
+  renderReativos();
+  renderEPI();
+  renderInspecoes();
+  renderRiscos();
+  renderDDS();
+  renderTreinamentos();
+  // Restore param fields
+  if(DB.params.hh) document.getElementById('r-hh').value = DB.params.hh;
+  if(DB.params.diasPerdidos) document.getElementById('r-diasPerdidos').value = DB.params.diasPerdidos;
+  if(DB.params.inicio) document.getElementById('g-inicio').value = DB.params.inicio;
+  if(DB.params.trab) document.getElementById('g-trab').value = DB.params.trab;
+  if(DB.params.hpd) document.getElementById('g-hpd').value = DB.params.hpd;
+  calcIndicadores();
+  calcHSA();
+  updateDashboard();
+})();
+</script>
+
+</body>
+</html>
